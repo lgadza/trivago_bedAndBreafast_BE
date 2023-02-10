@@ -47,19 +47,51 @@ accommodationRouter.get("/:accommodationId", async (req, res, next) => {
     next(error);
   }
 });
-accommodationRouter.get("/", async (req, res, next) => {
-  try {
-  } catch (error) {
-    console.log(error);
-    next(error);
+accommodationRouter.put(
+  "/:accommodationId",
+  JWTAuthMiddleware,
+  adminOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const updatedAccommodation = await AccommodationsModel.findByIdAndUpdate(
+        req.params.accommodationId,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.send(updatedAccommodation);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
-accommodationRouter.get("/", async (req, res, next) => {
-  try {
-  } catch (error) {
-    console.log(error);
-    next(error);
+);
+accommodationRouter.delete(
+  "/:accommodationId",
+  JWTAuthMiddleware,
+  adminOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const deletedAccommodation = await AccommodationsModel.findByIdAndDelete(
+        req.params.accommodationId
+      );
+      if (deletedAccommodation) {
+        res.status(204).send();
+      } else {
+        next(
+          createHttpError(
+            404,
+            `Accommodation with id ${req.params.accommodationId} not found!`
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
+);
 
 export default accommodationRouter;
