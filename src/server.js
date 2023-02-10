@@ -11,6 +11,7 @@ import {
 } from "./errorHandlers.js";
 import googleStrategy from "./lib/auth/google.js";
 import passport from "passport";
+import accommodationRouter from "./api/accommodations/index.js";
 
 const server = express();
 const port = process.env.PORT || 3001;
@@ -22,6 +23,7 @@ server.use(express.json());
 server.use(passport.initialize());
 // ****************************** ENDPOINTS ****************************
 server.use("/users", usersRouter);
+server.use("/accommodations", accommodationRouter);
 
 // *************************** ERROR HANDLERS **************************
 server.use(notFoundErrorHandler);

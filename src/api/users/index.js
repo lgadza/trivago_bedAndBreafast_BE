@@ -10,9 +10,27 @@ const usersRouter = express.Router();
 
 usersRouter.post("/register", async (req, res, next) => {
   try {
-    const newUser = new UsersModel(req.body);
-    const { _id } = await newUser.save();
-    res.status(201).send({ _id });
+    const { email, password } = req.body;
+    const user = await UsersModel.findOne({ email });
+    const userCridentials = await UsersModel.checkCredentials(email, password);
+
+    if (user && userCridentials) {
+      const payload = {
+        _id: userCridentials._id,
+        role: userCridentials.role,
+      };
+
+      const accessToken = await createAccessToken(payload);
+      res.send({ accessToken });
+    } else if (!user) {
+      const newUser = new UsersModel(req.body);
+      const user = await newUser.save();
+      const payload = { _id: user._id, role: user.role };
+      const accessToken = await createAccessToken(payload);
+      res.send({ accessToken });
+    } else {
+      next(createHttpError(401, "Credentials are not ok!"));
+    }
   } catch (error) {
     next(error);
   }

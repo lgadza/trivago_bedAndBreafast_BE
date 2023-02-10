@@ -9,7 +9,7 @@ const UsersSchema = new Schema(
     surname: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: false },
-    role: { type: String, enum: ["User", "Admin"], default: "User" },
+    role: { type: String, enum: ["Guest", "Host"], default: "Guest" },
     googleId: { type: String, required: false },
   },
   { timestamps: true }
