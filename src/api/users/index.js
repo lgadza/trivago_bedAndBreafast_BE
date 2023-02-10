@@ -82,7 +82,7 @@ usersRouter.get(
   async (req, res, next) => {
     try {
       const user = await UsersModel.findById(req.user._id).populate({
-        path: "accommodation",
+        path: "accommodations",
         select: "name description maxGuests city",
       });
       if (user) {

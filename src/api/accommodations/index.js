@@ -3,6 +3,7 @@ import AccommodationsModel from "./model.js";
 import { checkAccommodationSchema, triggerBadRequest } from "./validator.js";
 import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 import { adminOnlyMiddleware } from "../../lib/auth/adminOnly.js";
+import UsersModel from "../users/model.js";
 
 const accommodationRouter = express.Router();
 
@@ -16,6 +17,9 @@ accommodationRouter.post(
     try {
       const newAccommodation = new AccommodationsModel(req.body);
       const { _id } = await newAccommodation.save();
+      const targetUser = await UsersModel.findByIdAndUpdate(req.user._id, {
+        $push: { accommodations: _id },
+      });
       res.status(201).send({ _id });
     } catch (error) {
       console.log(error);
