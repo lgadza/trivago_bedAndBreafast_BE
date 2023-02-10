@@ -2,6 +2,7 @@ import express from "express";
 import AccommodationsModel from "./model.js";
 import { checkAccommodationSchema, triggerBadRequest } from "./validator.js";
 import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
+import { adminOnlyMiddleware } from "../../lib/auth/adminOnly.js";
 
 const accommodationRouter = express.Router();
 
@@ -9,6 +10,8 @@ accommodationRouter.post(
   "/",
   checkAccommodationSchema,
   triggerBadRequest,
+  JWTAuthMiddleware,
+  adminOnlyMiddleware,
   async (req, res, next) => {
     try {
       const newAccommodation = new AccommodationsModel(req.body);
