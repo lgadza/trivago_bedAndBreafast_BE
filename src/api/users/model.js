@@ -11,9 +11,23 @@ const UsersSchema = new Schema(
     password: { type: String, required: false },
     role: { type: String, enum: ["Guest", "Host"], default: "Guest" },
     googleId: { type: String, required: false },
+    accommodations: [{ type: Schema.Types.ObjectId, ref: "Accommodation" }],
   },
   { timestamps: true }
 );
+UsersSchema.static("findAccommodationsWithHost", async function (query) {
+  const total = await this.countDocuments(query.criteria);
+
+  const accommodations = await this.find(query.criteria, query.options.fields)
+    .limit(query.options.limit)
+    .skip(query.options.skip)
+    .sort(query.options.sort)
+    .populate({
+      path: "accommodations",
+      select: "name description maxGuests city ",
+    });
+  return { total, accommodations };
+});
 
 UsersSchema.pre("save", async function (next) {
   const currentUser = this;

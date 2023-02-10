@@ -5,6 +5,8 @@ import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 import { createAccessToken } from "../../lib/auth/tools.js";
 import UsersModel from "./model.js";
 import passport from "passport";
+import AccommodationsModel from "../accommodations/model.js";
+import q2m from "query-to-mongo";
 
 const usersRouter = express.Router();
 
@@ -73,6 +75,26 @@ usersRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
     next(error);
   }
 });
+usersRouter.get(
+  "/me/accommodations",
+  JWTAuthMiddleware,
+  adminOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const user = await UsersModel.findById(req.user._id).populate({
+        path: "accommodation",
+        select: "name description maxGuests city",
+      });
+      if (user) {
+        res.send(user);
+      } else {
+        next(createHttpError(404, `Not found!`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 usersRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
